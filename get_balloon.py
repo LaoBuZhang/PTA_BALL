@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import json
 import codecs
 import pickle
 import datetime
@@ -37,15 +38,15 @@ def asr_main(contest_id):
         #气球颜色
         str_str = "气球颜色："+problem_id+"\n"
         file.write(str_str)
+
         #考场
         addr={}
-        addr["A"]="6070"
-        addr["B"]="6061"
-        addr["C"]="4062"
-        addr["D"]="4066"
-        addr["E"]="4074"
-        addr["F"]="4065"
-        addr["G"]="4078"
+        # 读入room文件
+        with open("cfg_room.json", 'r', encoding='utf-8') as roomFile:
+            addr = json.load(roomFile)
+
+
+
         #team_id
         room=team_id[0:1]
         if(room=="A" or room=="B" or room=="C" or room=="D" or room=="E" or room=="F" or room=="G"):
@@ -80,8 +81,11 @@ def asr_main(contest_id):
 
     driver = webdriver.Chrome(service=service)
     driver.get(url)
-    cookies = [{'name': 'PTASession', 'value': "42c71d33-4002-407f-bfa5-c58a56545aa0"}]
-    # cookies = [{'name': 'PTASession', 'value': '2388399b-744b-4838-8aef-e96207042409'}]
+    # 读取配置文件
+    cfg={}
+    with open('cfg.json', 'r') as f:
+        cfg = json.load(f)
+    cookies = [{'name': 'PTASession', 'value': cfg['cookie']}]
     for cookie in cookies:
         driver.add_cookie(cookie)
     driver.get(url)
@@ -94,8 +98,11 @@ def asr_main(contest_id):
 
     html = driver.execute_script("return document.documentElement.outerHTML")
     soup = BeautifulSoup(html, 'html.parser')
+    # 找到所有数据
     titles = soup.find_all('tr')
     for title in titles:
+        print(title.text)
+        # 其中的一条数据
         if(title.text[0:1]=="提"):
             continue
         s=title.text[0:19]
@@ -105,7 +112,7 @@ def asr_main(contest_id):
         if(s<cnt):
             flag=False
         if(s>=cnt):
-            position = title.text.index("详")
+            position=title.text.index("详")
             position1=title.text.index("情")
             position2=title.text.index(")")
 

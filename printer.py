@@ -4,6 +4,7 @@ from Lib.Protocol.rpc_client import RpcClient
 from Lib.Api.yly_print import YlyPrint
 import datetime
 import random
+import json
 
 
 
@@ -14,9 +15,12 @@ def generate_order_number():
     return order_number
 
 def printer():
-    client_id="1074100376"
-    client_secret="62088c583c3388c249d33543b126e819"
-    machine_id="4004820161"
+    cfg=""
+    with open('cfg.json', 'r') as f:
+        cfg = json.load(f)
+    client_id=cfg['client_id']
+    client_secret=cfg['client_secret']
+    machine_id=cfg['machine_id']
 
     config = Config(client_id, client_secret)
     oauth_client = Oauth(config)
